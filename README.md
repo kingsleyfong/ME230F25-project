@@ -1,41 +1,38 @@
-ME230 Term Project Database
+# ME230 Term Project Database
 
-Repository for managing data, analysis scripts, and visuals for the ME230 Removable Anti Ram Bollard term project.
-This repo is the central source of truth for materials data, calculations, plots, and video assets.
+Repository for managing data, analysis scripts, and visuals for the **ME230 Removable Anti Ram Bollard** term project.  
+This repository is the central source of truth for materials data, calculations, plots, and video assets.
 
-Project Goals
+---
 
-Maintain a clean materials and design database.
+## Project Goals
 
-Make analysis reproducible with Python.
+- Maintain a clean and structured materials and design database.  
+- Allow all analysis to be reproducible using Python.  
+- Store code for MPI derivations, heat treatment analysis, corrosion checks, and durability comparisons.  
+- Store assets for the final video presentation.
 
-Store all code related to MPI, heat treatment, corrosion, and durability analysis.
+---
 
-Store assets for the final video presentation.
+## Tech Stack
 
-Tech Stack
+**Languages and Tools**  
+- Python 3  
+- SQLite (optional)  
+- Jupyter notebooks (optional)
 
-Languages and Tools
+**Python Libraries**  
+- pandas  
+- numpy  
+- matplotlib or plotly  
+- sqlalchemy  
+- manim (optional for animations)
 
-Python 3
+---
 
-SQLite (optional)
+## Repository Structure
 
-Jupyter notebooks (optional)
-
-Python Libraries
-
-pandas
-
-numpy
-
-matplotlib or plotly
-
-sqlalchemy
-
-manim (optional for animations)
-
-Repository Structure
+```
 .
 ├─ data/
 │  ├─ raw/                 # Original, unmodified data
@@ -48,145 +45,154 @@ Repository Structure
 │  └─ visuals/             # Manim animation scripts and figures
 │
 ├─ notebooks/              # Optional Jupyter notebooks
-├─ docs/                   # Generated plots, tables, supporting files
-├─ tests/                  # Unit tests for core analysis functions
+├─ docs/                   # Generated plots, tables, and supporting files
+├─ tests/                  # Simple tests for core analysis functions
 ├─ requirements.txt        # Python dependencies
 └─ README.md               # Project overview
+```
 
-Getting Started
-1. Clone the repository
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```
 git clone https://github.com/<username>/<repo>.git
 cd <repo>
+```
 
-2. Create a virtual environment
+### 2. Create a virtual environment
+
+```
 python -m venv .venv
-
+```
 
 Activate it:
 
 Windows:
 
+```
 .venv\Scripts\activate
-
+```
 
 macOS and Linux:
 
+```
 source .venv/bin/activate
+```
 
-3. Install dependencies
+### 3. Install dependencies
+
+```
 pip install -r requirements.txt
+```
 
-Data Workflow
-Data Sources
+---
 
-Lab 2 aluminum tensile data
+## Data Workflow
 
-CES Granta exports
+### Data Sources
 
-Supplier material sheets
+- ME230 Lab 2 aluminum data  
+- CES Granta material exports  
+- Supplier data sheets  
+- Askeland and Callister textbook tables  
 
-Textbook property tables
+### Steps
 
-Steps
+1. Place all raw files in `data/raw/`.  
+2. Use scripts in `src/analysis/` to clean and preprocess data.  
+3. Save cleaned files to `data/processed/`.  
+4. Optionally load processed data into a SQLite database in `data/db/`.
 
-Place raw files in data/raw/.
+---
 
-Process with scripts in src/analysis/.
+## Analysis Scripts
 
-Store cleaned CSVs in data/processed/.
+This project includes analysis for:
 
-Optionally load into SQLite (data/db/).
-
-Analysis Scripts
-
-Includes:
-
-MPI derivation and ranking
-
-Bending, yield, and deflection calculations
-
-Corrosion susceptibility table
-
-Heat treatment suitability
-
-ASTM crash rating mechanical checks
+- Material Performance Index (MPI) derivations  
+- Bending, deflection, and yield checks  
+- Corrosion susceptibility and environmental durability  
+- Heat treatment suitability for aluminum and steel  
+- ASTM crash rating related metrics  
 
 Example command:
 
+```
 python src/analysis/run_all.py
+```
 
+All outputs (plots, tables, figures) should be stored in the `docs/` folder.
 
-Outputs are stored in docs/.
+---
 
-Visuals and Animations
+## Visuals and Animations
 
-For 3Blue1Brown style animations:
+If using **Manim** for 3Blue1Brown style animations, store scenes in:
 
-Scenes stored in src/visuals/
+```
+src/visuals/
+```
 
-Render example:
+Example render command:
 
+```
 manim -pqh 01_intro_scene.py IntroScene
+```
 
-Collaboration Guidelines
-Branching
+Rendered animations can be used in the final Bongo video submission.
 
-main for stable code
+---
 
-feature branches such as:
+## Collaboration Guidelines
 
-feature/db-schema
+### Branching Strategy
 
-feature/mpi-calcs
+- `main` is the stable branch  
+- Create feature branches such as:  
+  - `feature/db-schema`  
+  - `feature/materials-cleaning`  
+  - `feature/mpi-calcs`  
+  - `feature/visuals`  
 
-feature/visuals
+### Commit Messages
 
-Commit messages
+Use short and descriptive messages. Examples:
 
-Examples:
+- Add materials database schema  
+- Implement bending based MPI  
+- Generate aluminum vs steel comparison plots  
 
-Add materials database schema
+### Pull Requests
 
-Implement bending based MPI
+- Open a PR into `main`  
+- Request review from group members  
+- Merge once approved  
 
-Generate comparison plot for aluminum vs steel
+---
 
-Pull Requests
+## References
 
-Open PR into main
+- ME230 Course Outline  
+- ME230 Project Topic 7 Bollard description  
+- ASTM F2656 crash rating documentation  
+- Askeland, Science and Engineering of Materials  
+- Ashby, Materials Selection in Mechanical Design  
+- Callister, Materials Science and Engineering  
 
-Request review from group mates
+---
 
-Merge after approval
+## To Do List
 
-References
+- [ ] Finalize repository structure  
+- [ ] Add dependencies to requirements.txt  
+- [ ] Implement database schema  
+- [ ] Import and clean Lab 2 aluminum data  
+- [ ] Implement MPI analysis  
+- [ ] Generate all plots and diagrams  
+- [ ] Build Manim animations  
+- [ ] Prepare all outputs for final video submission  
 
-ME230 Course Outline
-
-ME230 Topic 7 Bollard Description
-
-ASTM F2656 crash rating details
-
-Askeland (Science and Engineering of Materials)
-
-Ashby (Materials Selection in Mechanical Design)
-
-Callister (Materials Science and Engineering)
-
-To Do List
-
- Finalize repo structure
-
- Add Python dependencies
-
- Implement database schema
-
- Import and clean Lab 2 aluminum data
-
- Implement all MPI calculations
-
- Generate plots and diagrams
-
- Build Manim animations for video
-
- Prepare outputs for Bongo submission
+---
