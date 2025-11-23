@@ -1,0 +1,9 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3529212410_2905868209_223132457.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_1357010057_932578814.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_1508223206_19459810.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_2282615532_4063950418.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_3288765276_3984155704.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_2520889909_3151327891.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_330099138_4009522538.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/annt_spec_scene/1080p60/partial_movie_files/AnntSpecScene/3040924799_807188262_210259938.mp4'
