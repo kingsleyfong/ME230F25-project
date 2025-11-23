@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2752311994_813288348_223132457.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_422628456_3583531568.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_129817923_793093837.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_422628456_2043727257.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_3407725318_375439319.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_2968904986_1403415777.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_903176515_2356500799.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2272357178_4229673186_2324765780.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/2279932398_1246409771_4185731014.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/1000166390_2655130700_1991154882.mp4'
+file 'file:C:/Users/Kingsley/Documents/ME230Proj/media/videos/title_scene/480p15/partial_movie_files/TitleScene/1000166390_422628456_1222303298.mp4'
