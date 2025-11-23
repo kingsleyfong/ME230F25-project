@@ -1,198 +1,157 @@
-# ME230 Term Project Database
+# ME230 Bollard Material Selection Video Project
 
-Repository for managing data, analysis scripts, and visuals for the **ME230 Removable Anti Ram Bollard** term project.  
-This repository is the central source of truth for materials data, calculations, plots, and video assets.
-
----
-
-## Project Goals
-
-- Maintain a clean and structured materials and design database.  
-- Allow all analysis to be reproducible using Python.  
-- Store code for MPI derivations, heat treatment analysis, corrosion checks, and durability comparisons.  
-- Store assets for the final video presentation.
+This repository contains the full source code, assets, and documentation for the ME230 Fall 2025 group video project. The video is produced using Manim Community Edition to create 3Blue1Brown-style animations, with scene generation assisted by Antigravity IDE. The project evaluates the commercial ANNT stainless steel bollard, performs comparative material analysis, and presents results through an animated engineering video.
 
 ---
 
-## Tech Stack
+## Project Overview
 
-**Languages and Tools**  
-- Python 3  
-- SQLite (optional)  
-- Jupyter notebooks (optional)
+The purpose of this project is to investigate the material selection process for vehicle impact protection bollards. This includes:
 
-**Python Libraries**  
-- pandas  
-- numpy  
-- matplotlib or plotly  
-- sqlalchemy  
-- manim (optional for animations)
+- Introducing the real world problem and recent case studies involving vehicle ramming incidents.
+- Presenting the commercial baseline product using the ANNT AISI 304 stainless steel bollard.
+- Analyzing alternative materials using quantitative metrics such as density, cost, yield strength, and manufacturability.
+- Demonstrating manufacturing steps, load cases, impact behavior, and failure modes.
+- Summarizing findings through animated explanations.
+
+The final deliverable is a 3Blue1Brown-style video containing all scenes rendered using Manim.
 
 ---
 
 ## Repository Structure
 
-```
-.
-├─ data/
-│  ├─ raw/                 # Original, unmodified data
-│  ├─ processed/           # Cleaned and structured CSV files
-│  └─ db/                  # SQLite database files
+ME230Proj/
 │
-├─ src/
-│  ├─ db/                  # Database setup and query scripts
-│  ├─ analysis/            # MPI, deflection, yield, corrosion analysis
-│  └─ visuals/             # Manim animation scripts and figures
+├── context.md # Strict project-wide rules for Antigravity scene generation
 │
-├─ notebooks/              # Optional Jupyter notebooks
-├─ docs/                   # Generated plots, tables, and supporting files
-├─ tests/                  # Simple tests for core analysis functions
-├─ requirements.txt        # Python dependencies
-└─ README.md               # Project overview
-```
+├── src/
+│ ├── scenes/ # All Manim scene files generated through Antigravity
+│ │ ├── title_scene.py
+│ │ ├── attack_sequence_scene.py
+│ │ ├── bollard_intro_scene.py
+│ │ ├── steel_manufacturing_scene.py
+│ │ ├── annt_spec_scene.py
+│ │ └── (future scenes)
+│ │
+│ ├── visuals/ # Optional shared helper classes or drawing utilities
+│ └── init.py
+│
+├── assets/
+│ ├── images/
+│ │ ├── attacks/ # Images used for vehicle attack sequence
+│ │ ├── annt_spec/ # JPEG exports of ANNT spec sheet
+│ │ └── diagrams/ # Custom diagrams or blueprint shapes
+│ ├── audio/ # Music or VO tracks if required
+│ └── fonts/ # Segoe UI if manually embedded
+│
+└── media/ # Manim output folder (generated automatically)
+
+yaml
+Copy code
 
 ---
 
-## Getting Started
+## Development Workflow
 
-### 1. Clone the repository
+### 1. Write and structure scenes in Antigravity IDE
+Scene generation is prompted using natural language following the strict formatting rules defined in `context.md`.
 
-```
-git clone https://github.com/<username>/<repo>.git
-cd <repo>
-```
+### 2. Antigravity produces a complete Manim scene file
+The IDE writes the scene into `src/scenes/`.
 
-### 2. Create a virtual environment
+### 3. Render scenes locally using Manim
+All scenes are rendered individually. Example:
 
-```
-python -m venv .venv
-```
+python -m manim -pqh src/scenes/title_scene.py TitleScene
 
-Activate it:
+yaml
+Copy code
 
-Windows:
+High quality mode uses 1080p at 60 fps.
 
-```
-.venv\Scripts\activate
-```
+### 4. Inspect and revise scenes
+Adjust prompts to change layout, motion, or text. Re-render until final.
 
-macOS and Linux:
-
-```
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```
-pip install -r requirements.txt
-```
+### 5. Version control through GitHub
+Regularly push updated scene files, assets, and documentation.
 
 ---
 
-## Data Workflow
+## Rendering Scenes
 
-### Data Sources
+Every scene can be rendered using:
 
-- ME230 Lab 2 aluminum data  
-- CES Granta material exports  
-- Supplier data sheets  
-- Askeland and Callister textbook tables  
+python -m manim -pqh path/to/scene.py SceneName
 
-### Steps
+css
+Copy code
 
-1. Place all raw files in `data/raw/`.  
-2. Use scripts in `src/analysis/` to clean and preprocess data.  
-3. Save cleaned files to `data/processed/`.  
-4. Optionally load processed data into a SQLite database in `data/db/`.
+To force a specific resolution:
 
----
+python -m manim -p -r 1920,1080 --fps 60 path/to/scene.py SceneName
 
-## Analysis Scripts
-
-This project includes analysis for:
-
-- Material Performance Index (MPI) derivations  
-- Bending, deflection, and yield checks  
-- Corrosion susceptibility and environmental durability  
-- Heat treatment suitability for aluminum and steel  
-- ASTM crash rating related metrics  
-
-Example command:
-
-```
-python src/analysis/run_all.py
-```
-
-All outputs (plots, tables, figures) should be stored in the `docs/` folder.
+yaml
+Copy code
 
 ---
 
-## Visuals and Animations
+## Dependencies
 
-If using **Manim** for 3Blue1Brown style animations, store scenes in:
+This project uses:
 
-```
-src/visuals/
-```
+- Python 3.11 or 3.10
+- Manim Community Edition 0.19
+- FFmpeg (required for video export)
+- Segoe UI font (installed system-wide or provided inside `assets/fonts`)
 
-Example render command:
+Install Manim using:
 
-```
-manim -pqh 01_intro_scene.py IntroScene
-```
+python -m pip install manim
 
-Rendered animations can be used in the final Bongo video submission.
+arduino
+Copy code
 
----
+If FFmpeg is not available:
 
-## Collaboration Guidelines
+winget install ffmpeg
 
-### Branching Strategy
-
-- `main` is the stable branch  
-- Create feature branches such as:  
-  - `feature/db-schema`  
-  - `feature/materials-cleaning`  
-  - `feature/mpi-calcs`  
-  - `feature/visuals`  
-
-### Commit Messages
-
-Use short and descriptive messages. Examples:
-
-- Add materials database schema  
-- Implement bending based MPI  
-- Generate aluminum vs steel comparison plots  
-
-### Pull Requests
-
-- Open a PR into `main`  
-- Request review from group members  
-- Merge once approved  
+yaml
+Copy code
 
 ---
 
-## References
+## Asset Requirements
 
-- ME230 Course Outline  
-- ME230 Project Topic 7 Bollard description  
-- ASTM F2656 crash rating documentation  
-- Askeland, Science and Engineering of Materials  
-- Ashby, Materials Selection in Mechanical Design  
-- Callister, Materials Science and Engineering  
+To maintain the visual consistency of the video:
+
+- All diagrammatic elements are vector based.
+- All photos must be placed in `assets/images/`.
+- All spec sheet pages must be exported as JPEG.
+- No external network calls occur inside scene files.
+
+---
+
+## Using Antigravity With This Repository
+
+1. Open the project folder inside Antigravity IDE.
+2. Load `context.md` into the system prompt.
+3. Describe new scenes using structured prompts.
+4. Antigravity generates validated Manim code that follows all style rules.
+5. Place generated files into `src/scenes/`.
+
+This ensures consistency across all scenes.
 
 ---
 
-## To Do List
+## Authors
 
-- [ ] Finalize repository structure  
-- [ ] Add dependencies to requirements.txt  
-- [ ] Implement database schema  
-- [ ] Import and clean Lab 2 aluminum data  
-- [ ] Implement MPI analysis  
-- [ ] Generate all plots and diagrams  
-- [ ] Build Manim animations  
-- [ ] Prepare all outputs for final video submission  
+ME230 Group Members  
+- Adam Benaissa  
+- Joseph Schuurman  
+- Kingsley Fong  
 
 ---
+
+## License
+
+All Manim scene files and custom animations are released for educational use within the course. External images such as news photos or manufacturer spec sheets remain under their original copyright and are included for academic fair use only.
