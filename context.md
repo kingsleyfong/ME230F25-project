@@ -33,8 +33,8 @@ The model should not reimpose directory structures or unrelated boilerplate. It 
 User behavior:
 
 - The user will paste prompts like:
-  - “Create an intro scene that shows desaturated images of several cities with captions and then a line of text that bridges into engineering.”
-  - “Add a scene that shows a hollow cylinder bollard, draws the bending stress equation, and then highlights a material selection index.”
+  - "Create an intro scene that shows desaturated images of several cities with captions and then a line of text that bridges into engineering."
+  - "Add a scene that shows a hollow cylinder bollard, draws the bending stress equation, and then highlights a material selection index."
 
 Model behavior:
 
@@ -85,10 +85,19 @@ General target: 3Blue1Brown inspired look.
 ## 5. Text and language constraints
 
 - Use `Text` for plain text, `MathTex` for equations.
-- No em dash character. Never output “—”.
+- No em dash character. Never output "—".
   - Use comma, period, or simple hyphen `-` with spaces instead.
 - Keep labels concise.
 - Use academically neutral tone for on screen text.
+
+### Text rendering quality
+
+To ensure crisp, readable text at all quality levels:
+
+- **Do NOT use** `stroke_color=BLACK` with `stroke_width` on white text. This creates thin outlines that appear blurry.
+- **For headers/titles**: Use `color=WHITE, weight=BOLD` for clear, bold appearance.
+- **For body text**: Use `color=WHITE` only, without stroke parameters.
+- **For accent text**: Use `color=CYAN` or `color=CYAN, weight=BOLD`.
 
 Examples of allowed text:
 
@@ -99,126 +108,129 @@ Examples of allowed text:
 Examples of formatting:
 
 ```python
-title = Text("ME230 Materials Selection Project").scale(0.9)
-subtitle = Text("Ram raid resistant bollard materials analysis").scale(0.6)
-6. Timing and pacing guidelines
+# Headers - use weight=BOLD for clarity
+title = Text("ME230 Materials Selection Project", color=WHITE, weight=BOLD).scale(0.9)
+subtitle = Text("Ram raid resistant bollard materials analysis", color=WHITE).scale(0.6)
+
+# Body text - clean white, no stroke
+label = Text("Impact energy", color=WHITE).scale(0.4)
+
+# Accent text
+highlight = Text("Key finding", color=CYAN, weight=BOLD).scale(0.5)
+```
+
+## 6. Timing and pacing guidelines
+
 Default timing when user does not specify:
 
-Fade in a major element: run_time=1.0
-
-Fade out a major element: run_time=0.7
-
-Short hold: self.wait(0.5)
-
-Standard hold: self.wait(1.0)
-
-Longer emphasis hold: self.wait(2.0)
+- Fade in a major element: `run_time=1.0`
+- Fade out a major element: `run_time=0.7`
+- Short hold: `self.wait(0.5)`
+- Standard hold: `self.wait(1.0)`
+- Longer emphasis hold: `self.wait(2.0)`
 
 For sequences:
 
-Show one element, wait briefly, then bring in the next.
-
-Avoid stacking too many elements at once.
-
-Use a final brief hold before ending a scene.
+- Show one element, wait briefly, then bring in the next.
+- Avoid stacking too many elements at once.
+- Use a final brief hold before ending a scene.
 
 If the user specifies timing, follow their numbers.
 
-7. Scene structure pattern
+## 7. Scene structure pattern
+
 Recommended pattern inside each scene:
 
 Create base elements:
 
-python
-Copy code
+```python
 from manim import *
 
 class SomeScene(Scene):
     def construct(self):
-        title = Text("Some Title").to_edge(UP)
-        body = Text("Main idea here").scale(0.7)
+        title = Text("Some Title", color=WHITE, weight=BOLD).to_edge(UP)
+        body = Text("Main idea here", color=WHITE).scale(0.7)
+```
+
 Animate step by step:
 
-python
-Copy code
+```python
         self.play(FadeIn(title))
         self.wait(0.5)
         self.play(Write(body))
         self.wait(1.0)
+```
+
 If needed, transform or move groups:
 
-python
-Copy code
+```python
         group = VGroup(title, body)
         self.play(group.animate.to_edge(UP))
         self.wait(0.5)
+```
+
 Remove or replace elements when transitioning to a new logical step.
 
 Each prompt from the user can describe these steps in natural language. The model converts that description into a construct sequence.
 
-8. Media usage
+## 8. Media usage
+
 If the user references images:
 
-Use ImageMobject("path/to/file.jpg").
-
-They may specify paths like assets/images/intro/toronto_2018.jpg.
+- Use `ImageMobject("path/to/file.jpg")`.
+- They may specify paths like `assets/images/intro/toronto_2018.jpg`.
 
 Apply gentle styling:
 
+```python
 image.set_opacity(0.6)
-
-image.scale(1.1) or similar.
+image.scale(1.1)
+```
 
 Example pattern:
 
-python
-Copy code
+```python
 bg = ImageMobject("assets/images/intro/nice_2016.jpg")
 bg.set_opacity(0.6)
 bg.scale(1.1)
 self.play(FadeIn(bg, run_time=1.0))
+```
+
 If the user does not provide exact paths, assume placeholder names and make it clear in comments that the paths must exist.
 
-9. Safety and tone for real world events
+## 9. Safety and tone for real world events
+
 If the scene involves real attacks, disasters, or sensitive topics:
 
-Do not describe graphic content.
-
-Use wide angle, abstract, or symbolic imagery in code comments and text.
-
-Text should be factual and respectful.
+- Do not describe graphic content.
+- Use wide angle, abstract, or symbolic imagery in code comments and text.
+- Text should be factual and respectful.
 
 Examples of acceptable captions:
 
-"Nice, France - 2016"
-
-"Berlin, Germany - 2016"
-
-"Toronto, Canada - 2018"
+- "Nice, France - 2016"
+- "Berlin, Germany - 2016"
+- "Toronto, Canada - 2018"
 
 No casualty counts or sensational language unless the user explicitly requests it and it remains factual and restrained.
 
-10. Response format
+## 10. Response format
+
 When responding to a prompt in this workspace:
 
-Primary output is a single Python code block containing the full scene implementation or modification.
+- Primary output is a single Python code block containing the full scene implementation or modification.
+- If a file path is relevant, include it as a short comment at the top of the response, for example:
 
-If a file path is relevant, include it as a short comment at the top of the response, for example:
-
-python
-Copy code
+```python
 # File: src/visuals/scenes/01_intro_scene.py
 from manim import *
 
 class IntroScene(Scene):
     def construct(self):
         ...
-Explanations outside code should be minimal, only to clarify where the code should go or what it replaces.
+```
 
-Do not generate directory trees, build pipelines, or environment instructions unless specifically asked.
+- Explanations outside code should be minimal, only to clarify where the code should go or what it replaces.
+- Do not generate directory trees, build pipelines, or environment instructions unless specifically asked.
 
 The model is a scene generator and editor inside an existing Manim project. Technical domain content (equations, numbers, material properties) is driven by user prompts rather than hard coded in this context file.
-
-makefile
-Copy code
-::contentReference[oaicite:0]{index=0}

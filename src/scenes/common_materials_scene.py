@@ -4,181 +4,311 @@ Text.set_default(font="Segoe UI")
 
 class CommonMaterialsScene(Scene):
     def construct(self):
-        self.camera.background_color = BLACK
+        # Global settings
+        self.camera.background_color = "#050505" # Nearly black
 
-        # PHASE 1 - Title and three icons
-        title = Text("Common Bollard Materials", color=WHITE)
+        # --- PHASE 1 – Title ---
+        title = Text("Common bollard materials and design baseline", font_size=40, color=WHITE)
         title.set_stroke(color=BLACK, width=1.5)
-        title.to_edge(UP, buff=1.0)
+        title.to_edge(UP, buff=0.5)
 
-        self.play(FadeIn(title, run_time=0.7))
-        self.wait(0.5)
+        self.play(FadeIn(title, run_time=1.0))
 
-        # Helper to create base bollard shape
-        def create_bollard_icon(color, width, height, label_text, stroke_color=WHITE, fill_opacity=0.2):
-            ground = Line(LEFT * 1.5, RIGHT * 1.5, color=WHITE, stroke_width=2)
-            post = RoundedRectangle(
-                corner_radius=0.1,
-                width=width,
-                height=height,
-                color=stroke_color,
-                fill_color=color,
-                fill_opacity=fill_opacity,
-                stroke_width=2
-            )
-            post.move_to(ground.get_center() + UP * (height / 2))
-            foundation = Rectangle(
-                width=width * 1.2,
-                height=0.8,
-                color=stroke_color,
-                fill_color=color,
-                fill_opacity=fill_opacity * 0.5,
-                stroke_width=2
-            )
-            foundation.move_to(ground.get_center() + DOWN * 0.4)
+        # --- PHASE 2 – Material classes ---
+        
+        # Helper to create a card
+        def create_card(header_text, bullets_list, icon_mobject, position):
+            card_width = 4.0
+            card_height = 5.5
             
-            # Create label
-            label = Text(label_text, font_size=24, color=WHITE)
-            label.set_stroke(color=BLACK, width=1.5)
-            label.next_to(post, UP, buff=0.5)
+            # Card outline
+            outline = RoundedRectangle(corner_radius=0.2, width=card_width, height=card_height, color=WHITE)
+            outline.set_stroke(width=1.5)
             
-            return VGroup(foundation, post, ground, label), post, label
+            # Header
+            header = Text(header_text, font_size=28, color=WHITE)
+            header.set_stroke(color=BLACK, width=1.5)
+            header.next_to(outline.get_top(), DOWN, buff=0.3)
+            
+            # Cyan accent line
+            accent = Line(LEFT * (card_width/2 - 0.2), RIGHT * (card_width/2 - 0.2), color="#00FFFF")
+            accent.next_to(header, DOWN, buff=0.1)
+            
+            # Icon placement
+            icon_mobject.next_to(accent, DOWN, buff=0.3)
+            
+            # Bullets
+            bullet_group = VGroup()
+            for b_text in bullets_list:
+                dot = Text("•", font_size=20, color=WHITE)
+                txt = Text(b_text, font_size=20, color=WHITE)
+                line = VGroup(dot, txt).arrange(RIGHT, buff=0.1, aligned_edge=UP)
+                bullet_group.add(line)
+            
+            bullet_group.arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+            bullet_group.next_to(icon_mobject, DOWN, buff=0.4)
+            
+            # Group everything
+            card_group = VGroup(outline, header, accent, icon_mobject, bullet_group)
+            card_group.move_to(position)
+            return card_group, bullet_group
 
-        # Concrete Icon
-        concrete_group, concrete_post, concrete_label = create_bollard_icon(GRAY, 0.8, 2.0, "Concrete", stroke_color=GRAY_A, fill_opacity=0.3)
-        
-        # Steel Icon
-        steel_group, steel_post, steel_label = create_bollard_icon(GRAY_C, 0.6, 2.0, "Steel", stroke_color=WHITE, fill_opacity=0.4)
-        # Add subtle band
-        steel_band = Line(steel_post.get_left(), steel_post.get_right(), color=WHITE, stroke_width=1).shift(UP * 0.5)
-        steel_group.add(steel_band)
+        # 1. Concrete Icon
+        concrete_icon = Square(side_length=1.0, color=WHITE)
+        crack1 = Line(concrete_icon.get_top() + LEFT*0.2, concrete_icon.get_center() + RIGHT*0.1, color=WHITE)
+        crack2 = Line(concrete_icon.get_center() + RIGHT*0.1, concrete_icon.get_bottom() + LEFT*0.1, color=WHITE)
+        concrete_icon_grp = VGroup(concrete_icon, crack1, crack2)
 
-        # Polymer Icon
-        polymer_group, polymer_post, polymer_label = create_bollard_icon(YELLOW, 0.7, 2.0, "Polymer", stroke_color=YELLOW, fill_opacity=0.3)
-        # Round top more
-        polymer_cap = Arc(radius=0.35, start_angle=0, angle=PI, color=YELLOW, stroke_width=2)
-        polymer_cap.move_to(polymer_post.get_top() + DOWN * 0.1) # Adjust position slightly
-        # For simplicity, just use the rounded rect, but maybe add a colored sleeve effect
-        # Let's keep it simple as per instructions, the color distinguishes it.
+        # 2. Polymer Icon (Bent post)
+        poly_path = VMobject(color=WHITE)
+        poly_path.set_points_smoothly([
+            UP*0.5 + LEFT*0.2,
+            UP*0.2 + LEFT*0.1,
+            ORIGIN,
+            DOWN*0.2 + RIGHT*0.1,
+            DOWN*0.5 + RIGHT*0.2
+        ])
+        # Make it a thick line or outline
+        poly_icon = poly_path.set_stroke(width=4)
+        # Or a shape
+        poly_shape = VGroup(
+            Line(UP*0.5, UP*0.2, color=WHITE),
+            Arc(radius=0.5, start_angle=PI, angle=-PI/4, color=WHITE).shift(RIGHT*0.5),
+        ) # Simplified bent shape
+        # Let's use a simple curved rectangle approximation
+        poly_icon_grp = RoundedRectangle(corner_radius=0.2, width=0.4, height=1.0, color=WHITE)
+        poly_icon_grp.apply_function(lambda p: p + np.array([0.1 * (p[1]**2), 0, 0])) # Bend it slightly
 
-        # Arrange icons
-        icons = VGroup(concrete_group, steel_group, polymer_group)
-        icons.arrange(RIGHT, buff=2.0)
-        icons.move_to(ORIGIN)
+        # 3. Metal Icon (Cylinder)
+        metal_body = Rectangle(width=0.4, height=1.0, color=WHITE)
+        metal_top = Ellipse(width=0.4, height=0.15, color=WHITE).move_to(metal_body.get_top())
+        metal_icon_grp = VGroup(metal_body, metal_top)
 
-        self.play(
-            FadeIn(icons, shift=UP * 0.5, run_time=0.8)
-        )
-        self.wait(0.5)
-
-        # Helper for bullets
-        def create_bullets(text1, text2):
-            b1 = Text(text1, font_size=24, color=WHITE)
-            b1.set_stroke(color=BLACK, width=1.5)
-            b2 = Text(text2, font_size=24, color=WHITE)
-            b2.set_stroke(color=BLACK, width=1.5)
-            g = VGroup(b1, b2).arrange(DOWN, buff=0.2)
-            g.to_edge(DOWN, buff=1.0)
-            return g
-
-        # PHASE 2 - Focus on Concrete
-        self.play(
-            concrete_group.animate.scale(1.1),
-            steel_group.animate.set_opacity(0.3),
-            polymer_group.animate.set_opacity(0.3),
-            run_time=0.5
-        )
-
-        bullets_concrete = create_bullets("Low cost, simple to install", "Handles small hits, cracks under heavy impact")
-        self.play(FadeIn(bullets_concrete, run_time=0.5))
-        self.wait(7.0) # Wait for narration
-
-        # Impact Concrete
-        arrow_concrete = Arrow(start=LEFT, end=RIGHT, color=YELLOW).next_to(concrete_post, LEFT, buff=1.0)
-        self.play(arrow_concrete.animate.next_to(concrete_post, LEFT, buff=0.1), run_time=1.0)
-        
-        # Crack effect
-        crack = VGroup(
-            Line(concrete_post.get_center(), concrete_post.get_corner(UR), color=BLACK, stroke_width=2),
-            Line(concrete_post.get_center(), concrete_post.get_corner(DL), color=BLACK, stroke_width=2),
-            Line(concrete_post.get_center() + UP*0.2, concrete_post.get_right(), color=BLACK, stroke_width=2)
-        )
-        self.play(Create(crack, run_time=0.3))
-        self.play(concrete_group.animate.rotate(0.05 * TAU).rotate(-0.05 * TAU), run_time=0.2) # Shake
-        
-        self.wait(6.0) # Hold result
-        self.play(FadeOut(arrow_concrete), FadeOut(crack))
-        self.play(FadeOut(bullets_concrete))
-
-        # PHASE 3 - Focus on Steel
-        self.play(
-            concrete_group.animate.scale(1/1.1),
-            steel_group.animate.scale(1.1).set_opacity(1),
-            run_time=0.5
-        )
-
-        bullets_steel = create_bullets("High strength, ductile metal", "Good one time barrier, can deform permanently")
-        self.play(FadeIn(bullets_steel, run_time=0.5))
-        self.wait(7.0) # Wait for narration
-
-        # Impact Steel
-        arrow_steel = Arrow(start=LEFT, end=RIGHT, color=YELLOW).next_to(steel_post, LEFT, buff=1.0)
-        self.play(arrow_steel.animate.next_to(steel_post, LEFT, buff=0.1), run_time=1.0)
-
-        # Bend effect
-        # Rotate post around its bottom center
-        self.play(
-            Rotate(steel_post, angle=-15*DEGREES, about_point=steel_post.get_bottom(), run_time=0.5),
-            Rotate(steel_band, angle=-15*DEGREES, about_point=steel_post.get_bottom(), run_time=0.5)
+        # Create Cards
+        # Positions: Left (-4), Center (0), Right (4)
+        concrete_card, concrete_bullets = create_card(
+            "Concrete", 
+            ["Brittle failure", "Poor energy absorption", "Quality varies"], 
+            concrete_icon_grp, 
+            LEFT * 4.2
         )
         
-        self.wait(6.0) # Hold result
-        self.play(FadeOut(arrow_steel))
-        self.play(FadeOut(bullets_steel))
-
-        # PHASE 4 - Focus on Polymer
-        self.play(
-            steel_group.animate.scale(1/1.1).set_opacity(0.3), # Dim steel
-            concrete_group.animate.set_opacity(0.3), # Keep concrete dim
-            polymer_group.animate.scale(1.1).set_opacity(1),
-            run_time=0.5
+        polymer_card, polymer_bullets = create_card(
+            "Polymers", 
+            ["Good for low speed", "Not for high energy impacts"], 
+            poly_icon_grp, 
+            ORIGIN
+        )
+        
+        metal_card, metal_bullets = create_card(
+            "Metals", 
+            ["High strength", "Better energy absorption", "Suitable for K4 type impacts"], 
+            metal_icon_grp, 
+            RIGHT * 4.2
         )
 
-        bullets_polymer = create_bullets("Flexible shell over core", "Springs back after small collisions")
-        self.play(FadeIn(bullets_polymer, run_time=0.5))
-        self.wait(7.0) # Wait for narration
-
-        # Impact Polymer
-        arrow_polymer = Arrow(start=LEFT, end=RIGHT, color=YELLOW).next_to(polymer_post, LEFT, buff=1.0)
-        self.play(arrow_polymer.animate.next_to(polymer_post, LEFT, buff=0.1), run_time=1.0)
-
-        # Elastic bend effect
-        self.play(Rotate(polymer_post, angle=-25*DEGREES, about_point=polymer_post.get_bottom(), run_time=0.4))
-        self.play(Rotate(polymer_post, angle=25*DEGREES, about_point=polymer_post.get_bottom(), run_time=0.6)) # Spring back
-
-        self.wait(6.0) # Hold result
-        self.play(FadeOut(arrow_polymer))
-        self.play(FadeOut(bullets_polymer))
-
-        # PHASE 5 - Quick comparison wrap and fade out
+        # Animation 1: Slide in cards
         self.play(
-            concrete_group.animate.set_opacity(1),
-            steel_group.animate.set_opacity(1),
-            polymer_group.animate.scale(1/1.1),
-            run_time=0.5
-        )
-
-        summary_text = Text("Different materials trade off cost, durability, and collision behavior.", font_size=28, color=WHITE)
-        summary_text.set_stroke(color=BLACK, width=1.5)
-        summary_text.to_edge(DOWN, buff=1.0)
-
-        self.play(FadeIn(summary_text, run_time=0.7))
-        self.wait(1.5)
-
-        self.play(
-            FadeOut(title),
-            FadeOut(icons),
-            FadeOut(summary_text),
+            FadeIn(concrete_card, shift=RIGHT),
+            FadeIn(polymer_card, shift=RIGHT),
+            FadeIn(metal_card, shift=RIGHT),
             run_time=1.0
         )
+
+        # Animation 2-4: FadeIn bullets
+        for b in concrete_bullets:
+            self.play(FadeIn(b, run_time=0.3))
+        self.wait(0.2)
+        
+        for b in polymer_bullets:
+            self.play(FadeIn(b, run_time=0.3))
+        self.wait(0.2)
+        
+        for b in metal_bullets:
+            self.play(FadeIn(b, run_time=0.3))
         self.wait(0.5)
+
+        # Highlight Metals
+        # Dim others
+        self.play(
+            concrete_card.animate.set_opacity(0.3),
+            polymer_card.animate.set_opacity(0.3),
+            run_time=1.0
+        )
+        
+        # Glow for metals
+        metal_glow = metal_card[0].copy().set_color("#00FFFF").set_stroke(width=4, opacity=0.5)
+        self.play(FadeIn(metal_glow))
+
+        # Bottom text
+        focus_text = Text("This study focuses on metal bollards.", font_size=32, color=WHITE)
+        focus_text.set_stroke(color=BLACK, width=1.5)
+        focus_text.to_edge(DOWN, buff=0.5)
+        self.play(FadeIn(focus_text))
+        self.wait(1.0)
+
+        # --- PHASE 3 – Steel focus ---
+        # Transition: Fade out others, Move Metal card to left
+        self.play(
+            FadeOut(concrete_card),
+            FadeOut(polymer_card),
+            FadeOut(focus_text),
+            FadeOut(metal_glow), # Remove glow during move
+            metal_card.animate.to_edge(LEFT, buff=1.0).scale(1.1),
+            run_time=1.5
+        )
+
+        # Update Header to "Steel bollards"
+        # metal_card children: 0:outline, 1:header, 2:accent, 3:icon, 4:bullets
+        old_header = metal_card[1]
+        new_header = Text("Steel bollards", font_size=28, color=WHITE)
+        new_header.set_stroke(color=BLACK, width=1.5)
+        new_header.move_to(old_header.get_center())
+        
+        self.play(Transform(old_header, new_header))
+
+        # Update Bullets
+        # 1. "Most common bollard type"
+        # 2. "Relatively low cost"
+        # 3. "One major impact can deform steel and crack the base"
+        
+        new_bullet_texts = [
+            "Most common bollard type",
+            "Relatively low cost",
+            "One major impact can deform steel and crack the base"
+        ]
+        
+        # Rebuild bullets group
+        new_bullets_grp = VGroup()
+        for b_text in new_bullet_texts:
+            dot = Text("•", font_size=20, color=WHITE)
+            # Wrap text if too long? "One major impact..." might be long.
+            # Manim Text doesn't auto wrap easily, but we can scale or break lines manually if needed.
+            # Let's try fitting it.
+            if "One major impact" in b_text:
+                txt = Text("One major impact can deform\nsteel and crack the base", font_size=20, color=WHITE, line_spacing=1.0)
+            else:
+                txt = Text(b_text, font_size=20, color=WHITE)
+            line = VGroup(dot, txt).arrange(RIGHT, buff=0.1, aligned_edge=UP)
+            new_bullets_grp.add(line)
+            
+        new_bullets_grp.arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        # Position where old bullets were
+        # metal_card[4] is the old bullets group
+        new_bullets_grp.move_to(metal_card[4].get_center(), aligned_edge=LEFT)
+        # Adjust vertical alignment if needed
+        new_bullets_grp.next_to(metal_card[3], DOWN, buff=0.4)
+        
+        self.play(FadeOut(metal_card[4]), FadeIn(new_bullets_grp))
+        # Update the reference in the group so it moves with it if we moved it again (not needed here but good practice)
+        metal_card.remove(metal_card[4])
+        metal_card.add(new_bullets_grp)
+
+        # Impact Animation
+        # Add concrete base
+        # metal_card[3] is the icon group
+        icon = metal_card[3]
+        base = Rectangle(width=0.8, height=0.2, color=GREY)
+        base.set_fill(GREY, opacity=0.5)
+        base.next_to(icon, DOWN, buff=0)
+        self.play(FadeIn(base))
+        
+        # Impact: Nudge icon
+        self.play(icon.animate.shift(RIGHT * 0.1), run_time=0.1)
+        self.play(icon.animate.shift(LEFT * 0.1), run_time=0.1)
+        
+        # Deform icon
+        # Skew or rotate slightly
+        bent_icon = icon.copy()
+        # Simple rotation for bending
+        bent_icon.rotate(-10 * DEGREES, about_point=bent_icon.get_bottom())
+        # Shift top part more?
+        
+        # Crack in base
+        base_crack = Line(base.get_top(), base.get_bottom() + RIGHT*0.1, color=BLACK, stroke_width=2)
+        
+        self.play(
+            Transform(icon, bent_icon),
+            Create(base_crack),
+            run_time=1.0
+        )
+        
+        self.wait(1.0)
+
+        # --- PHASE 4 – Standards and K4 baseline ---
+        
+        # Standards Panel (Right side)
+        standards_panel = VGroup()
+        s_outline = RoundedRectangle(corner_radius=0.2, width=5.0, height=3.0, color=WHITE)
+        s_header = Text("Vehicle impact standards", font_size=24, color=WHITE)
+        s_header.next_to(s_outline.get_top(), DOWN, buff=0.2)
+        s_accent = Line(LEFT*2, RIGHT*2, color="#00FFFF").next_to(s_header, DOWN, buff=0.1)
+        
+        s_bullets = VGroup(
+            Text("• ASTM F2656", font_size=20, color=WHITE),
+            Text("• ASTM F3016", font_size=20, color=WHITE),
+            Text("• IWA 14", font_size=20, color=WHITE),
+            Text("• U.S. DoS K ratings (K4, K8, K12)", font_size=20, color=WHITE)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        s_bullets.next_to(s_accent, DOWN, buff=0.3)
+        
+        standards_panel.add(s_outline, s_header, s_accent, s_bullets)
+        standards_panel.move_to(RIGHT * 3.5 + UP * 1.5)
+        
+        # K4 Baseline Card (Below Standards)
+        k4_panel = VGroup()
+        k_outline = RoundedRectangle(corner_radius=0.2, width=5.0, height=3.0, color=WHITE)
+        k_header = Text("Baseline for this study", font_size=24, color=WHITE)
+        k_header.next_to(k_outline.get_top(), DOWN, buff=0.2)
+        k_accent = Line(LEFT*2, RIGHT*2, color="#00FFFF").next_to(k_header, DOWN, buff=0.1)
+        
+        k_bullets = VGroup(
+            Text("• K4 rating: 2000 kg at 57 km/h", font_size=20, color=WHITE),
+            Text("• All loads, thickness sizing, and\n  MPIs reference this scenario", font_size=20, color=WHITE, line_spacing=1.0)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+        k_bullets.next_to(k_accent, DOWN, buff=0.2)
+        
+        # Schematic Icon
+        # Car -> Arrow -> Bollard
+        schematic = VGroup()
+        s_car = RoundedRectangle(corner_radius=0.1, width=0.6, height=0.3, color=WHITE)
+        s_bollard = Rectangle(width=0.1, height=0.4, color=WHITE)
+        s_arrow = Arrow(start=LEFT*0.5, end=RIGHT*0.5, color="#00FFFF", buff=0, max_tip_length_to_length_ratio=0.3)
+        
+        s_car.next_to(s_arrow, LEFT, buff=0.1)
+        s_bollard.next_to(s_arrow, RIGHT, buff=0.1)
+        
+        schematic.add(s_car, s_arrow, s_bollard)
+        schematic.next_to(k_bullets, DOWN, buff=0.3)
+        
+        # Labels
+        l_mass = Text("2000 kg", font_size=16, color="#00FFFF").next_to(s_car, UP, buff=0.1)
+        l_speed = Text("57 km/h", font_size=16, color="#00FFFF").next_to(s_arrow, UP, buff=0.1)
+        
+        k4_panel.add(k_outline, k_header, k_accent, k_bullets, schematic, l_mass, l_speed)
+        k4_panel.move_to(RIGHT * 3.5 + DOWN * 2.0)
+
+        # Animations Phase 4
+        self.play(FadeIn(standards_panel))
+        self.play(FadeIn(k4_panel))
+        self.play(GrowArrow(s_arrow))
+        self.play(FadeIn(l_mass), FadeIn(l_speed))
+        
+        self.wait(2.0)
+
+        # --- PHASE 5 – Exit ---
+        self.play(
+            FadeOut(standards_panel),
+            FadeOut(k4_panel),
+            run_time=1.0
+        )
+        self.play(
+            FadeOut(metal_card),
+            FadeOut(base),
+            FadeOut(base_crack),
+            run_time=1.0
+        )
+        # "This study focuses..." was already faded out earlier.
+        self.play(FadeOut(title), run_time=1.0)
+        
+        self.wait(0.3)

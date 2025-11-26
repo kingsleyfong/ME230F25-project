@@ -1,75 +1,143 @@
 from manim import *
+
 Text.set_default(font="Segoe UI")
 
 class AttackSequenceScene(Scene):
     def construct(self):
-        # 1. Background: Pure black
+        # Global settings
         self.camera.background_color = BLACK
 
-        # List of attacks: (Image Path, Caption Text)
-        attacks = [
-            ("assets/images/attacks/nice_2016.jpg", "Nice, France 2016"),
-            ("assets/images/attacks/berlin_2016.jpg", "Berlin, Germany 2016"),
-            ("assets/images/attacks/london_2017.jpg", "London, United Kingdom 2017"),
-            ("assets/images/attacks/barcelona_2017.jpg", "Barcelona, Spain 2017"),
-            ("assets/images/attacks/nyc_2017.jpg", "New York City, United States 2017"),
-            ("assets/images/attacks/toronto_2018.jpg", "Toronto, Canada 2018"),
+        # --- 1. TITLE CARD ---
+        # "Vehicle as a Weapon Attacks"
+        # "2016 to 2018"
+        
+        title = Text("Vehicle as a Weapon Attacks", font_size=48, color=WHITE)
+        title.set_stroke(color=BLACK, width=2)
+        title.move_to(UP * 0.5)
+
+        subtitle = Text("2016 to 2018", font_size=36, color=WHITE)
+        subtitle.set_stroke(color=BLACK, width=2)
+        subtitle.next_to(title, DOWN, buff=0.5)
+
+        title_group = VGroup(title, subtitle)
+
+        # Animation: FadeIn 1.0s, Hold 1.5s, FadeOut 0.8s
+        self.play(FadeIn(title_group, run_time=1.0))
+        self.wait(1.5)
+        self.play(FadeOut(title_group, run_time=0.8))
+
+        # --- 2. ATTACK IMAGE SEQUENCE ---
+        
+        # Helper to create image group
+        def create_image_slide(image_name, caption_text, year_text):
+            # Load image
+            # Assuming assets/attack_images/ exists relative to execution dir
+            # If not found, Manim usually raises FileNotFoundError or shows placeholder.
+            # We will use try-except block or just assume it works as per prompt.
+            img_path = f"assets/images/attacks/{image_name}"
+            
+            # Create ImageMobject
+            # We need to handle potential missing files gracefully if possible, 
+            # but for this code generation we assume they exist.
+            img = ImageMobject(img_path)
+            
+            # Scale to fit height of screen with some margin, or width
+            # Screen height is 8 units (approx).
+            img.height = 6.0 
+            
+            # Vignette
+            # Full screen rectangle, black, opacity 0.3
+            vignette = Rectangle(
+                width=config.frame_width,
+                height=config.frame_height,
+                color=BLACK,
+                fill_opacity=0.3,
+                stroke_width=0
+            )
+            # Vignette goes on top of image? 
+            # "Place this rectangle behind any captions but in front of the background."
+            # And "Group the image and vignette together".
+            # If it's in front of background but behind caption, it should be:
+            # [Background] [Image] [Vignette] [Caption]
+            # But the prompt says "Group the image and vignette together so they animate as one."
+            # So Image + Vignette.
+            
+            # Caption
+            # "Nice, France 2016"
+            full_caption = f"{caption_text}  {year_text}"
+            caption = Text(full_caption, font_size=32, color=WHITE)
+            caption.set_stroke(color=BLACK, width=2)
+            caption.to_edge(DOWN, buff=1.0)
+            
+            # Group: Image, Vignette (on top of image), Caption (on top of vignette)
+            # Wait, if vignette is full screen, it covers the image.
+            # If we group them, FadeIn(group) fades them all in.
+            
+            # Let's verify Z-order.
+            # We want Image at back, Vignette over it, Caption over Vignette.
+            
+            # However, if vignette is full screen, it might darken the whole scene including previous elements?
+            # But previous elements are faded out.
+            
+            slide_group = Group(img, vignette, caption)
+            return slide_group
+
+        # Define sequence data
+        # (Image file, Caption Text, Year/Suffix, FadeIn, Hold, FadeOut)
+        sequence_data = [
+            ("nice_2016.jpg", "Nice, France", "2016", 1.0, 6.0, 0.8),
+            ("berlin_2016.jpg", "Berlin", "2016", 0.7, 1.2, 0.5),
+            ("london_2017.jpg", "London", "2017", 0.7, 1.0, 0.5),
+            ("barcelona_2017.jpg", "Barcelona", "2017", 0.7, 1.0, 0.5),
+            ("toronto_2018.jpg", "Toronto", "2018", 0.7, 1.5, 0.8),
         ]
 
-        for image_path, caption_text in attacks:
-            # 2. Image setup
-            image = ImageMobject(image_path)
-            # Centered on screen at approx 70 percent of the frame width
-            image.scale_to_fit_width(config.frame_width * 0.7)
-
-            # 3. Vignette effect
-            # Implemented using a VGroup with the image and layered rectangles
-            # to simulate a soft, medium-strength black vignette.
+        for img_file, cap_text, year, t_in, t_hold, t_out in sequence_data:
+            # Create slide
+            # Note: We create it fresh each time
             
-            # Layer 1: Base darkening (subtle)
-            vignette_base = Rectangle(
-                width=image.width,
-                height=image.height,
+            # Image path
+            img_path = f"assets/images/attacks/{img_file}"
+            
+            # Image
+            image = ImageMobject(img_path)
+            # Scale to cover most of screen but keep aspect ratio
+            # Let's scale to height 7.5 to leave room for caption
+            image.height = 7.5
+            
+            # Vignette
+            vignette = Rectangle(
+                width=config.frame_width,
+                height=config.frame_height,
                 color=BLACK,
-                fill_opacity=0.15,
+                fill_opacity=0.3,
                 stroke_width=0
             )
             
-            # Layer 2: Soft border (simulating gradient edge)
-            vignette_border = Rectangle(
-                width=image.width,
-                height=image.height,
-                color=BLACK,
-                fill_opacity=0,
-                stroke_width=30,
-                stroke_opacity=0.3
-            )
+            # Caption
+            caption_str = f"{cap_text}  {year}"
+            caption = Text(caption_str, font_size=36, color=WHITE)
+            caption.set_stroke(color=BLACK, width=2)
+            caption.to_edge(DOWN, buff=0.5)
+            
+            # Group
+            # Order matters for display
+            slide = Group(image, vignette, caption)
+            
+            # Animation
+            self.play(FadeIn(slide, run_time=t_in))
+            self.wait(t_hold)
+            self.play(FadeOut(slide, run_time=t_out))
 
-            # Grouping image and vignette layers
-            image_group = Group(image, vignette_base, vignette_border)
 
-            # 6. & 7. Caption setup
-            # White text with a thin black outline, bottom center
-            caption = Text(caption_text, font_size=36, color=WHITE)
-            caption.set_stroke(color=BLACK, width=2, opacity=1)
-            caption.to_edge(DOWN, buff=1.0)
+        # --- 3. END CARD ---
+        # "How do we stop this?"
+        
+        end_text = Text("How do we stop this?", font_size=48, color=WHITE)
+        end_text.set_stroke(color=BLACK, width=2)
+        end_text.move_to(ORIGIN)
 
-            # 4. Animation Sequence
-            # Fade in over 0.5 seconds
-            self.play(
-                FadeIn(image_group, run_time=0.5),
-                FadeIn(caption, run_time=0.5)
-            )
-
-            # Hold for 1.5 seconds
-            self.wait(1.5)
-
-            # Fade out over 0.7 seconds
-            self.play(
-                FadeOut(image_group, run_time=0.7),
-                FadeOut(caption, run_time=0.7)
-            )
-
-        # 8. Final fade to black (implicit) and hold
-        # The scene is already black after fade out, so we just wait.
-        self.wait(1.0)
+        # Animation: FadeIn 1.0s, Hold 1.5s, FadeOut 1.0s
+        self.play(FadeIn(end_text, run_time=1.0))
+        self.wait(1.5)
+        self.play(FadeOut(end_text, run_time=1.0))

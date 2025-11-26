@@ -1,253 +1,273 @@
 from manim import *
 
-Text.set_default(font="Segoe UI")
+# Set default font to Segoe UI with BOLD weight for better visibility
+Text.set_default(font="Segoe UI", weight="BOLD")
 
 class SteelManufacturingScene(Scene):
     def construct(self):
-        self.camera.background_color = BLACK
+        # Global settings
+        self.camera.background_color = "#050505"
+        
+        # Style constants
+        TEXT_STROKE_WIDTH = 0 
+        TEXT_COLOR = WHITE
+        GEO_COLOR = WHITE
+        HIGHLIGHT_COLOR = "#00FFFF" # Cyan
 
-        # PHASE 1 - Title and horizontal process pipeline
-        title = Text("Typical Steel Bollard Manufacturing", color=WHITE)
-        title.set_stroke(color=BLACK, width=1.5)
-        title.to_edge(UP, buff=0.5)
+        # ----------------------------------------------------------
+        # PHASE 1 – Title
+        # ----------------------------------------------------------
+        # Reduced buff to 0.2 to save vertical space
+        title = Text("Typical manufacturing of steel bollards", font_size=48, color=TEXT_COLOR)
+        title.to_edge(UP, buff=0.2)
 
-        self.play(FadeIn(title, run_time=0.7))
+        self.play(FadeIn(title, run_time=1.0))
+
+        # ----------------------------------------------------------
+        # PHASE 2 – Design phase pipeline
+        # ----------------------------------------------------------
+        
+        def create_design_node(label_text, icon_mob):
+            label = Text(label_text, font_size=24, color=TEXT_COLOR)
+            
+            icon_container = Rectangle(width=1.5, height=1.5, stroke_opacity=0)
+            icon_mob.move_to(icon_container.get_center())
+            
+            group = VGroup(icon_container, icon_mob, label)
+            label.next_to(icon_container, DOWN, buff=0.1)
+            return group
+
+        # Node 1 Icon: Sketch
+        sketch_paper = Rectangle(width=0.8, height=1.0, color=GEO_COLOR)
+        sketch_bollard = VGroup(
+            Line(DOWN*0.3, UP*0.3, color=GEO_COLOR),
+            Circle(radius=0.1, color=GEO_COLOR).move_to(UP*0.3)
+        )
+        sketch_icon = VGroup(sketch_paper, sketch_bollard)
+        node1 = create_design_node("Rough sketches", sketch_icon)
+
+        # Node 2 Icon: 3D CAD
+        cad_cyl = Rectangle(width=0.4, height=0.8, color=GEO_COLOR)
+        cad_top = Ellipse(width=0.4, height=0.15, color=GEO_COLOR).move_to(cad_cyl.get_top())
+        cad_bottom = Ellipse(width=0.4, height=0.15, color=GEO_COLOR).move_to(cad_cyl.get_bottom())
+        cad_icon = VGroup(cad_cyl, cad_top, cad_bottom)
+        node2 = create_design_node("3D CAD model", cad_icon)
+
+        # Node 3 Icon: Impact Test
+        test_bollard = Line(DOWN*0.4, UP*0.4, stroke_width=4, color=GEO_COLOR)
+        test_car = VGroup(
+            RoundedRectangle(corner_radius=0.1, width=0.6, height=0.3, color=GEO_COLOR),
+            Circle(radius=0.1, color=GEO_COLOR).shift(LEFT*0.2 + DOWN*0.15),
+            Circle(radius=0.1, color=GEO_COLOR).shift(RIGHT*0.2 + DOWN*0.15)
+        ).scale(0.6).next_to(test_bollard, LEFT, buff=0.3)
+        test_arrow = Arrow(start=test_car.get_right(), end=test_bollard.get_left(), buff=0.05, max_tip_length_to_length_ratio=0.4, color=GEO_COLOR).scale(0.5)
+        test_icon = VGroup(test_bollard, test_car, test_arrow)
+        node3 = create_design_node("Prototype impact testing", test_icon)
+
+        # Arrange Nodes
+        # Moved UP to 2.4 to avoid title overlap and clear space below
+        design_row = VGroup(node1, node2, node3).arrange(RIGHT, buff=2.0)
+        design_row.move_to(UP * 2.4)
+
+        # Arrows between nodes
+        arrow1 = Arrow(start=node1.get_right(), end=node2.get_left(), buff=0.2, color=GEO_COLOR, stroke_width=2)
+        arrow2 = Arrow(start=node2.get_right(), end=node3.get_left(), buff=0.2, color=GEO_COLOR, stroke_width=2)
+
+        # Animation sequence
+        self.play(FadeIn(node1))
+        self.play(Create(arrow1))
+        self.play(FadeIn(node2))
+        self.play(Create(arrow2))
+        self.play(FadeIn(node3))
+        
         self.wait(0.5)
 
-        # Pipeline
-        pipeline_line = Line(LEFT * 5, RIGHT * 5, color=WHITE, stroke_width=2).shift(UP * 2)
-        
-        labels = ["Design", "Testing", "Fabrication", "Finishing"]
-        nodes = VGroup()
-        for i, label_text in enumerate(labels):
-            pos = pipeline_line.point_from_proportion(i / (len(labels) - 1))
-            dot = Dot(point=pos, color=WHITE, radius=0.15)
-            text = Text(label_text, font_size=20, color=WHITE).next_to(dot, UP, buff=0.2)
-            text.set_stroke(color=BLACK, width=1.5)
-            nodes.add(VGroup(dot, text))
+        # ----------------------------------------------------------
+        # PHASE 3 – Manufacturing and assembly pipeline
+        # ----------------------------------------------------------
 
-        pipeline = VGroup(pipeline_line, nodes)
+        def create_manuf_panel(header_text, icon_mob):
+            w, h = 3.0, 2.2 
+            panel = RoundedRectangle(corner_radius=0.2, width=w, height=h, color=GEO_COLOR)
+            header = Text(header_text, font_size=20, color=TEXT_COLOR)
+            header.next_to(panel.get_top(), DOWN, buff=0.2)
+            icon_mob.move_to(panel.get_center() + DOWN*0.2)
+            return VGroup(panel, header, icon_mob)
+
+        # Step 1: Raw Material
+        raw_cyl = Rectangle(width=1.2, height=0.4, color=GEO_COLOR)
+        raw_end1 = Ellipse(width=0.2, height=0.4, color=GEO_COLOR).move_to(raw_cyl.get_left())
+        raw_end2 = Ellipse(width=0.2, height=0.4, color=GEO_COLOR).move_to(raw_cyl.get_right())
+        step1_icon = VGroup(raw_cyl, raw_end1, raw_end2)
+        panel1 = create_manuf_panel("Steel pipe as raw material", step1_icon)
+
+        # Step 2: Machine base/cap
+        base_plate = Rectangle(width=1.0, height=0.15, color=GEO_COLOR)
+        cap_circle = Circle(radius=0.25, color=GEO_COLOR).next_to(base_plate, UP, buff=0.2)
+        gear = VGroup()
+        gear_body = Circle(radius=0.15, color=GEO_COLOR)
+        for i in range(8):
+            tooth = Rectangle(width=0.05, height=0.4, color=GEO_COLOR)
+            tooth.rotate(i * PI / 4)
+            gear.add(tooth)
+        gear.add(gear_body)
+        gear.scale(0.5).move_to(cap_circle.get_right() + RIGHT*0.3 + UP*0.1)
+        step2_icon = VGroup(base_plate, cap_circle, gear)
+        panel2 = create_manuf_panel("Machine base and cap", step2_icon)
+
+        # Step 3: MIG Weld
+        weld_base = Rectangle(width=0.8, height=0.1, color=GEO_COLOR)
+        weld_pipe = Rectangle(width=0.3, height=0.8, color=GEO_COLOR).next_to(weld_base, UP, buff=0)
+        torch = Triangle(color=GEO_COLOR).scale(0.15).rotate(135*DEGREES).move_to(weld_pipe.get_bottom() + RIGHT*0.3)
+        spark = VGroup(*[Line(ORIGIN, UP*0.1, color="#FFFF00").rotate(angle) for angle in [0, 45*DEGREES, 90*DEGREES, -45*DEGREES]])
+        spark.move_to(weld_pipe.get_bottom() + RIGHT*0.15).scale(0.5)
+        step3_icon = VGroup(weld_base, weld_pipe, torch, spark)
+        panel3 = create_manuf_panel("MIG weld components", step3_icon)
+
+        # Step 4: Quality Inspection
+        insp_bollard = Rectangle(width=0.2, height=0.8, color=GEO_COLOR)
+        check = VGroup(
+            Line(UP*0.1+LEFT*0.1, DOWN*0.1, color=GEO_COLOR),
+            Line(DOWN*0.1, UP*0.2+RIGHT*0.2, color=GEO_COLOR)
+        ).next_to(insp_bollard, RIGHT, buff=0.2)
+        step4_icon = VGroup(insp_bollard, check)
+        panel4 = create_manuf_panel("Quality inspection", step4_icon)
+
+        # Assemble Manufacturing Line
+        manuf_group = VGroup(panel1, panel2, panel3, panel4).arrange(RIGHT, buff=0.5)
         
-        self.play(Create(pipeline_line, run_time=1.0))
-        self.play(FadeIn(nodes, run_time=1.0))
+        # MOVED UP: Shifted to UP*0.3 to create gap below
+        manuf_group.move_to(UP * 0.3) 
+
+        # Arrows between panels
+        m_arrows = VGroup()
+        for i in range(3):
+            arr = Arrow(
+                start=manuf_group[i].get_right(), 
+                end=manuf_group[i+1].get_left(), 
+                buff=0.1, 
+                color=GEO_COLOR, 
+                max_tip_length_to_length_ratio=0.5
+            )
+            m_arrows.add(arr)
+
+        # Animation: Slide in
+        self.play(
+            FadeIn(manuf_group, shift=UP*0.5),
+            run_time=1.5
+        )
+
+        # Animation: Process flow
+        panels = [panel1, panel2, panel3, panel4]
+        for i, panel in enumerate(panels):
+            self.play(panel[0].animate.set_stroke(color=HIGHLIGHT_COLOR, width=3), run_time=0.5)
+            self.play(panel[0].animate.set_stroke(color=GEO_COLOR, width=1), run_time=0.5)
+            if i < 3:
+                self.play(Create(m_arrows[i]), run_time=0.3)
+
         self.wait(0.5)
 
-        # Helper for bullets
-        def create_bullets(text1, text2):
-            b1 = Text(text1, font_size=24, color=WHITE)
-            b1.set_stroke(color=BLACK, width=1.5)
-            b2 = Text(text2, font_size=24, color=WHITE)
-            b2.set_stroke(color=BLACK, width=1.5)
-            g = VGroup(b1, b2).arrange(DOWN, buff=0.2)
-            g.to_edge(DOWN, buff=1.0)
-            return g
-
-        # PHASE 2 - Design Phase
-        # Script: "The design phase of bollards is pretty typical, starting with rough sketches, moving to 3D models,"
-        design_node = nodes[0]
-        self.play(
-            design_node[0].animate.scale(1.5).set_color(BLUE),
-            nodes[1].animate.set_opacity(0.3),
-            nodes[2].animate.set_opacity(0.3),
-            nodes[3].animate.set_opacity(0.3),
-            run_time=0.5
-        )
-
-        # Panel 1: Rough Sketch
-        sketch = VGroup(
-            Line(DOWN, UP, color=GRAY),
-            Line(LEFT, RIGHT, color=GRAY).shift(DOWN),
-            Line(DOWN+LEFT*0.2, UP+RIGHT*0.2, color=GRAY).set_opacity(0.5)
-        ).scale(1.5).shift(LEFT * 3)
-
-        # Panel 2: CAD Model
-        cad_model = VGroup(
-            Rectangle(width=0.5, height=2.0, color=BLUE_B, stroke_width=2),
-            Line(LEFT*0.5, RIGHT*0.5, color=BLUE_B).shift(DOWN)
-        ).scale(1.5)
-
-        # Panel 3: Prototype
-        prototype = VGroup(
-            RoundedRectangle(corner_radius=0.1, width=0.6, height=2.2, color=WHITE, stroke_width=3),
-            Line(LEFT*0.8, RIGHT*0.8, color=WHITE).shift(DOWN*1.1)
-        ).scale(1.5).shift(RIGHT * 3)
+        # ----------------------------------------------------------
+        # PHASE 4 – Surface treatment and visibility
+        # ----------------------------------------------------------
         
-        # Checkmark for prototype
-        check = Text("✓", color=GREEN, font_size=40).next_to(prototype, UP)
-
-        self.play(FadeIn(sketch))
-        self.play(FadeIn(cad_model))
-        self.play(FadeIn(prototype), FadeIn(check))
-
-        bullets_design = create_bullets("Concept sketches and rough dimensions", "3D CAD model and prototype")
-        self.play(FadeIn(bullets_design))
-        self.wait(5.0) # Hold for narration part 1
-        self.play(FadeOut(bullets_design))
+        st_header = Text("Surface protection and visibility", font_size=28, color=TEXT_COLOR)
         
-        # Dim design visuals
-        design_visuals = VGroup(sketch, cad_model, prototype, check)
-        self.play(design_visuals.animate.set_opacity(0.2))
+        def create_treatment_item(label_text, icon_mob):
+            lbl = Text(label_text, font_size=22, color=TEXT_COLOR)
+            icon_mob.scale(0.5)
+            grp = VGroup(icon_mob, lbl).arrange(RIGHT, buff=0.2)
+            return grp
 
-        # PHASE 3 - Testing Phase
-        # Script: "then after the prototype withstands the proper impact resistance and load testing, the bollard is manufactured."
-        testing_node = nodes[1]
-        self.play(
-            design_node[0].animate.scale(1/1.5).set_color(WHITE).set_opacity(0.3),
-            testing_node.animate.scale(1.5).set_color(BLUE).set_opacity(1),
-            run_time=0.5
-        )
+        # T1: Galvanized
+        t1_tank = Rectangle(width=1.0, height=0.6, color=GEO_COLOR)
+        t1_liq = Line(t1_tank.get_left(), t1_tank.get_right(), color=GEO_COLOR).shift(DOWN*0.1)
+        t1_bol = Line(UP*0.3, DOWN*0.1, stroke_width=4, color=GEO_COLOR).move_to(t1_tank.get_center())
+        t1_icon = VGroup(t1_tank, t1_liq, t1_bol)
+        t1_item = create_treatment_item("Galvanized for corrosion resistance", t1_icon)
+
+        # T2: Powder coated
+        t2_bol = Line(DOWN*0.3, UP*0.3, stroke_width=4, color=GEO_COLOR)
+        t2_noz = Triangle(color=GEO_COLOR).scale(0.1).rotate(-90*DEGREES).next_to(t2_bol, LEFT, buff=0.2)
+        t2_spray = Circle(radius=0.1, stroke_opacity=0, fill_color=WHITE, fill_opacity=0.5).next_to(t2_noz, RIGHT, buff=0)
+        t2_icon = VGroup(t2_bol, t2_noz, t2_spray)
+        t2_item = create_treatment_item("Powder coated for durability", t2_icon)
+
+        # T3: Bright paint
+        t3_bol = Rectangle(width=0.1, height=0.6, color=GEO_COLOR)
+        t3_band = Rectangle(width=0.12, height=0.1, color=HIGHLIGHT_COLOR, fill_opacity=1).move_to(t3_bol.get_top() + DOWN*0.1)
+        t3_icon = VGroup(t3_bol, t3_band)
+        t3_item = create_treatment_item("Bright paint for visibility", t3_icon)
+
+        treatments_list = VGroup(t1_item, t2_item, t3_item).arrange(DOWN, aligned_edge=LEFT, buff=0.4)
         
-        self.play(FadeOut(design_visuals))
+        # Central Evolving Bollard (REDUCED HEIGHT to fit frame)
+        evolve_bollard_body = RoundedRectangle(corner_radius=0.1, width=0.8, height=1.8, color=GEO_COLOR)
+        evolve_bollard = VGroup(evolve_bollard_body).set_stroke(width=2)
+        
+        content_group = VGroup(treatments_list, evolve_bollard).arrange(RIGHT, buff=1.5)
+        phase4_group = VGroup(st_header, content_group).arrange(DOWN, buff=0.4)
+        
+        # MOVED DOWN: Shifted further down to 2.6
+        phase4_group.move_to(DOWN * 2.6)
 
-        # Test Rig
-        ground = Line(LEFT*3, RIGHT*3, color=WHITE)
-        test_bollard = RoundedRectangle(corner_radius=0.1, width=0.6, height=2.0, color=WHITE).move_to(ground.get_center() + UP)
-        sled = Rectangle(width=1.0, height=1.0, color=RED, fill_opacity=0.5).move_to(ground.get_left() + UP*0.5 + RIGHT*0.5)
-        force_arrow = Arrow(sled.get_right(), test_bollard.get_left(), color=RED, buff=0.1)
-
-        test_rig = VGroup(ground, test_bollard, sled, force_arrow)
-        self.play(FadeIn(test_rig))
-
-        # Impact Animation
+        # Animations Phase 4
+        self.play(FadeIn(st_header))
+        
+        # Step 1
+        self.play(FadeIn(t1_item), FadeIn(evolve_bollard))
         self.play(
-            sled.animate.next_to(test_bollard, LEFT, buff=0),
-            force_arrow.animate.put_start_and_end_on(sled.get_right() + RIGHT*2, test_bollard.get_left()), # Hacky arrow move
+            t1_item.animate.set_color(HIGHLIGHT_COLOR),
+            evolve_bollard.animate.set_stroke(color=GREY_B, width=3), 
             run_time=1.0
         )
-        # Deflection
-        self.play(test_bollard.animate.rotate(-10*DEGREES, about_point=test_bollard.get_bottom()), run_time=0.2)
-        self.play(test_bollard.animate.rotate(10*DEGREES, about_point=test_bollard.get_bottom()), run_time=0.2)
-        
-        # Pass
-        pass_check = Text("✓ PASS", color=GREEN, font_size=40).next_to(test_bollard, UP, buff=0.5)
-        self.play(FadeIn(pass_check))
+        self.play(t1_item.animate.set_color(WHITE))
 
-        bullets_testing = create_bullets("Impact and load tests on prototype", "Verify required safety performance")
-        self.play(FadeIn(bullets_testing))
-        self.wait(6.0) # Hold for narration part 2
-        self.play(FadeOut(bullets_testing))
-        self.play(FadeOut(test_rig), FadeOut(pass_check))
-
-        # PHASE 4 - Fabrication Phase
-        # Script: "The material is either laser cut or cast into shape, and smaller parts are machined. Everything is then welded together."
-        fab_node = nodes[2]
+        # Step 2
+        self.play(FadeIn(t2_item))
         self.play(
-            testing_node[0].animate.scale(1/1.5).set_color(WHITE).set_opacity(0.3),
-            fab_node.animate.scale(1.5).set_color(BLUE).set_opacity(1),
-            run_time=0.5
-        )
-
-        # Frame 1: Raw Stock
-        raw_plate = Rectangle(width=1.5, height=1.0, color=GRAY, fill_opacity=0.3).shift(LEFT*4)
-        raw_tube = Rectangle(width=0.4, height=2.0, color=GRAY, fill_opacity=0.3).next_to(raw_plate, RIGHT, buff=0.5)
-        frame1 = VGroup(raw_plate, raw_tube)
-        
-        # Frame 2: Cutting
-        laser = Triangle(color=YELLOW, fill_opacity=1).scale(0.2).rotate(180*DEGREES).move_to(raw_plate.get_top() + UP*0.2)
-        cut_plate = Rectangle(width=1.2, height=0.8, color=WHITE).move_to(raw_plate)
-        frame2 = VGroup(laser, cut_plate)
-
-        # Frame 3: Machining
-        lathe_tool = Square(side_length=0.3, color=ORANGE, fill_opacity=1).move_to(raw_tube.get_right())
-        machined_tube = RoundedRectangle(corner_radius=0.1, width=0.4, height=2.0, color=WHITE).move_to(raw_tube)
-        frame3 = VGroup(lathe_tool, machined_tube)
-
-        # Frame 4: Welding
-        weld_plate = cut_plate.copy().move_to(RIGHT*3 + DOWN*1)
-        weld_tube = machined_tube.copy().move_to(weld_plate.get_top() + UP*1)
-        weld_spark = Star(color=YELLOW, fill_opacity=1).scale(0.2).move_to(weld_tube.get_bottom())
-        frame4 = VGroup(weld_plate, weld_tube, weld_spark)
-
-        # Sequence
-        self.play(FadeIn(frame1))
-        self.wait(0.5)
-        self.play(Transform(frame1, frame2)) # Visualize cut
-        self.wait(0.5)
-        self.play(Transform(frame1, frame3)) # Visualize machine
-        self.wait(0.5)
-        self.play(Transform(frame1, frame4)) # Visualize weld
-        self.wait(0.5)
-
-        bullets_fab = create_bullets("Steel plate and tube cut and machined", "Components welded into one bollard")
-        self.play(FadeIn(bullets_fab))
-        self.wait(7.0) # Hold for narration part 3
-        self.play(FadeOut(bullets_fab))
-        self.play(FadeOut(frame1)) # frame1 holds the transformed mobject
-
-        # PHASE 5 - Finishing Phase
-        # Script: "Finally, the bollard is galvanized and given a powder coating for corrosion resistance. Lastly, a layer of bright paint is added for visibility."
-        finish_node = nodes[3]
-        self.play(
-            fab_node[0].animate.scale(1/1.5).set_color(WHITE).set_opacity(0.3),
-            finish_node.animate.scale(1.5).set_color(BLUE).set_opacity(1),
-            run_time=0.5
-        )
-
-        # Base bollard for finishing
-        fin_bollard = VGroup(
-            Rectangle(width=1.2, height=0.2, color=WHITE), # Base
-            RoundedRectangle(corner_radius=0.1, width=0.4, height=2.0, color=WHITE).shift(UP*1.1)
-        ).move_to(ORIGIN)
-
-        # Step 1: Galvanizing
-        bath = Rectangle(width=3, height=1.5, color=BLUE_A, fill_opacity=0.3).shift(DOWN*0.5)
-        bath_label = Text("Zinc Bath", font_size=20).next_to(bath, DOWN)
-        
-        self.play(FadeIn(fin_bollard), FadeIn(bath), FadeIn(bath_label))
-        self.play(fin_bollard.animate.shift(DOWN*0.5).set_color(GRAY_B), run_time=1.0) # Dip
-        self.play(fin_bollard.animate.shift(UP*0.5), run_time=1.0) # Remove
-        self.play(FadeOut(bath), FadeOut(bath_label))
-
-        # Step 2: Powder Coating
-        nozzle = Rectangle(width=0.5, height=0.2, color=GRAY).next_to(fin_bollard, LEFT, buff=1.0)
-        spray = VGroup(*[Dot(color=WHITE, radius=0.03).move_to(nozzle.get_right() + RIGHT*i*0.1 + UP*np.random.uniform(-0.2, 0.2)) for i in range(10)])
-        
-        self.play(FadeIn(nozzle))
-        self.play(ShowPassingFlash(spray, run_time=1.0), fin_bollard.animate.set_color(WHITE)) # Coat
-        self.play(FadeOut(nozzle))
-
-        # Step 3: Paint
-        brush = Line(UP, DOWN, color=YELLOW, stroke_width=5).next_to(fin_bollard, RIGHT, buff=0.5)
-        self.play(FadeIn(brush))
-        self.play(
-            brush.animate.shift(LEFT*0.5 + UP*1),
-            fin_bollard[1].animate.set_fill(YELLOW, opacity=1).set_stroke(color=YELLOW), # Paint post yellow
+            t2_item.animate.set_color(HIGHLIGHT_COLOR),
+            evolve_bollard.animate.set_fill(color="#333333", opacity=1).set_stroke(color=WHITE, width=4),
             run_time=1.0
         )
-        self.play(FadeOut(brush))
+        self.play(t2_item.animate.set_color(WHITE))
 
-        bullets_finish = create_bullets("Hot dip galvanizing for corrosion resistance", "Powder coat and paint for protection and visibility")
-        self.play(FadeIn(bullets_finish))
-        self.wait(8.0) # Hold for narration part 4
-        self.play(FadeOut(bullets_finish))
-
-        # PHASE 6 - Wrap up
-        self.play(
-            finish_node[0].animate.scale(1/1.5).set_color(WHITE),
-            nodes.animate.set_opacity(1),
-            run_time=0.5
-        )
+        # Step 3
+        # Add bright band
+        bright_band = Rectangle(width=0.82, height=0.4, color=HIGHLIGHT_COLOR, fill_opacity=1)
+        # Adjust position based on new height
+        bright_band.move_to(evolve_bollard.get_top() + DOWN*0.3)
         
-        # Add checkmarks to all nodes
-        checks = VGroup()
-        for node in nodes:
-            c = Text("✓", color=GREEN, font_size=24).next_to(node[0], DOWN, buff=0.1)
-            checks.add(c)
-        self.play(FadeIn(checks))
-
-        summary = Text("From sketch to finished steel bollard ready for installation", font_size=28, color=WHITE)
-        summary.set_stroke(color=BLACK, width=1.5)
-        summary.to_edge(DOWN, buff=1.0)
-        
-        self.play(FadeIn(summary))
-        self.wait(1.5)
-
+        self.play(FadeIn(t3_item))
         self.play(
-            FadeOut(title),
-            FadeOut(pipeline),
-            FadeOut(fin_bollard),
-            FadeOut(checks),
-            FadeOut(summary),
+            t3_item.animate.set_color(HIGHLIGHT_COLOR),
+            FadeIn(bright_band),
             run_time=1.0
         )
-        self.wait(0.5)
+        self.play(t3_item.animate.set_color(WHITE))
+
+        final_bollard_group = VGroup(evolve_bollard, bright_band)
+        self.wait(2.0)
+
+        # ----------------------------------------------------------
+        # PHASE 5 – Exit
+        # ----------------------------------------------------------
+        self.play(
+            FadeOut(phase4_group),
+            FadeOut(final_bollard_group), 
+            run_time=1.0
+        )
+        self.play(
+            FadeOut(manuf_group),
+            FadeOut(m_arrows),
+            run_time=1.0
+        )
+        self.play(
+            FadeOut(design_row),
+            FadeOut(arrow1),
+            FadeOut(arrow2),
+            run_time=1.0
+        )
+        self.play(FadeOut(title), run_time=1.0)
+        
+        self.wait(0.3)

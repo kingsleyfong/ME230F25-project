@@ -1,6 +1,8 @@
 from manim import *
 
-Text.set_default(font="Segoe UI")
+# Set default font to Segoe UI with BOLD weight for better visibility
+# This fixes the thin/blurry appearance
+Text.set_default(font="Segoe UI", weight="BOLD")
 
 class AnntSpecScene(Scene):
     def construct(self):
@@ -9,13 +11,15 @@ class AnntSpecScene(Scene):
 
         # PHASE 1 — Title
         title = Text("ANNT Stainless Steel Bollard", color=WHITE)
-        title.set_stroke(color=BLACK, width=1.5)
+        # REMOVED: title.set_stroke(color=BLACK, width=1.5) 
+        # Removing the stroke makes the text crisper
         title.to_edge(UP, buff=0.5)
 
         self.play(FadeIn(title, run_time=0.7))
         
         # PHASE 2 — Spec Sheet Pages (Side by Side)
         # Load images
+        # Note: Ensure these paths exist in your assets folder
         page1 = ImageMobject("assets/images/annt_spec/annt_spec_page1.jpg")
         page2 = ImageMobject("assets/images/annt_spec/annt_spec_page2.jpg")
 
@@ -102,8 +106,9 @@ class AnntSpecScene(Scene):
         
         caption_objs = []
         for line in caption_lines:
+            # Removed stroke here as well for clarity
             t = Text(line, color=WHITE, font_size=24)
-            t.set_stroke(color=BLACK, width=1.5)
+            # REMOVED: t.set_stroke(color=BLACK, width=1.5)
             caption_objs.append(t)
         
         caption = VGroup(*caption_objs).arrange(DOWN, buff=0.2)
